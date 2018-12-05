@@ -43,7 +43,7 @@ for (let i=0; i < inputArray.length; i++) {
     if (inputInfo.action == "change") {
         currGuard = inputInfo.guard;
         guardIDs.push(inputInfo.guard);
-    }
+    }   
     if (!currGuard) continue;
 
     if (inputInfo.action == "falls asleep") {
@@ -99,7 +99,49 @@ for (let [key, val] of Object.entries(minuteMostOftenSlept)) {
     }
 }
 
+//---------------------------------------------------------------------------------------
+
+let mostConsistentAsleepGuards = {}
+for (let i=0; i < guardIDs.length; i++) {
+    let guard = guardSleepTimes[guardIDs[i]];
+    let guardID = guardIDs[i];
+    if (!guard) continue;
+    if (!mostConsistentAsleepGuards[guardID]) mostConsistentAsleepGuards[guardID] = {};
+    for (let i=0; i < guard.length; i++) {
+        let month = guard[i];
+        if (!month) continue;
+        for (let i=0; i < month.length; i++) {
+            let day = month[i];
+            if (!day) continue;
+            for (let i=0; i < day.length; i++) {
+                let minute = day[i];
+                if (minute) {
+                    if (mostConsistentAsleepGuards[guardID][i]) mostConsistentAsleepGuards[guardID][i] += 1;
+                    else mostConsistentAsleepGuards[guardID][i] = 1;
+                }
+            }
+        }
+    }
+}
+
+let theSecondMinute;
+for (let [key, val] of Object.entries(mostConsistentAsleepGuards)) {
+    let guard = key;
+    let minutes = val;
+    for (let [key, val] of Object.entries(minutes)) {
+        if (!theSecondMinute || val > theSecondMinute.occurences) {
+            theSecondMinute = {
+                minute: key,
+                guard: guard,
+                occurences: val
+            }
+        }
+    }
+}
+
+
 let timeElapsed = Date.now() - startTime;
 
 console.log(theMinute.minute * highestSleepTimeGuard.id);
+console.log(theSecondMinute.minute * theSecondMinute.guard)
 console.log(`Took ${timeElapsed}ms`);
